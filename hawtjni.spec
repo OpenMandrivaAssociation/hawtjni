@@ -1,7 +1,7 @@
-%_javapackages_macros
+%{?_javapackages_macros:%_javapackages_macros}
 Name:             hawtjni
 Version:          1.9
-Release:          1.0%{?dist}
+Release:          1.1%{?dist}
 Summary:          Code generator that produces the JNI code
 
 License:          ASL 2.0 and EPL and BSD
