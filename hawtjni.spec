@@ -1,19 +1,19 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:             hawtjni
-Version:          1.9
-Release:          1.1%{?dist}
+Version:          1.10
+Release:          3.1
 Summary:          Code generator that produces the JNI code
-
+Group:		  Development/Java
 License:          ASL 2.0 and EPL and BSD
 URL:              http://hawtjni.fusesource.org/
+BuildArch:        noarch
 
 Source0:          https://github.com/fusesource/hawtjni/archive/hawtjni-project-%{version}.tar.gz
+
 Patch0:           0001-Fix-shading-and-remove-unneeded-modules.patch
 Patch1:           0002-Fix-xbean-compatibility.patch
 Patch2:           0003-Remove-plexus-maven-plugin-dependency.patch
 Patch3:           0004-Remove-eclipse-plugin.patch
-
-BuildArch:        noarch
 
 BuildRequires:    maven-local
 BuildRequires:    maven-compiler-plugin
@@ -24,12 +24,15 @@ BuildRequires:    maven-plugin-jxr
 BuildRequires:    maven-javadoc-plugin
 BuildRequires:    maven-surefire-plugin
 BuildRequires:    maven-clean-plugin
-BuildRequires:    maven-surefire-provider-junit4
 BuildRequires:    plexus-containers-component-metadata
 BuildRequires:    log4j
-BuildRequires:    junit4
+BuildRequires:    junit
 BuildRequires:    fusesource-pom
 BuildRequires:    xbean
+
+Requires:         autoconf
+Requires:         automake
+Requires:         libtool
 
 %description
 HawtJNI is a code generator that produces the JNI code needed to
@@ -40,14 +43,18 @@ JNI code which powers the eclipse platform.
 %package javadoc
 Summary:          Javadocs for %{name}
 
-
 %description javadoc
 This package contains the API documentation for %{name}.
 
+%package runtime
+Summary:          HawtJNI Runtime
+
+%description runtime
+This package provides API that projects using HawtJNI should build
+against.
+
 %package -n maven-hawtjni-plugin
 Summary:          Use HawtJNI from a maven plugin
-
-Requires:         hawtjni = %{version}-%{release}
 
 %description -n maven-%{name}-plugin
 This package allows to use HawtJNI from a maven plugin.
@@ -66,7 +73,10 @@ This package allows to use HawtJNI from a maven plugin.
 # %pom_add_dep "org.apache.maven:maven-compat:3.0.3" maven-hawtjni-plugin/pom.xml
 # %pom_remove_plugin ":maven-shade-plugin" hawtjni-generator/pom.xml
 
+%mvn_package ":hawtjni-runtime" runtime
 %mvn_package ":maven-hawtjni-plugin" maven-plugin
+
+%pom_xpath_set "pom:groupId[text()='asm']" org.ow2.asm hawtjni-generator
 
 %build
 %mvn_build
@@ -74,17 +84,41 @@ This package allows to use HawtJNI from a maven plugin.
 %install
 %mvn_install
 
-%files -f .mfiles
+%files runtime -f .mfiles-runtime
 %dir %{_javadir}/%{name}
 %doc readme.md license.txt changelog.md
+
+%files -f .mfiles
 
 %files javadoc -f .mfiles-javadoc
 %doc license.txt
 
 %files -n maven-hawtjni-plugin -f .mfiles-maven-plugin
-%doc license.txt
 
 %changelog
+* Fri Nov 21 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.10-3
+- Spit runtime into subpackage
+- Resolves: rhbz#1166607
+
+* Mon Jun  9 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.10-2
+- Add requires on autoconf, automake, libtool
+
+* Mon Jun  9 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.10-1
+- Update to upstream version 1.10
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.9-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Mon May 26 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.9-4
+- Migrate BuildRequires from junit4 to junit
+
+* Mon May 26 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.9-3
+- Remove BuildRequires on maven-surefire-provider-junit4
+
+* Thu Mar  6 2014 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.9-2
+- Update to ASM4
+- Resolves: rhbz#1073507
+
 * Wed Sep 18 2013 Marek Goldmann <mgoldman@redhat.com> - 1.9-1
 - Upstream release 1.9
 - hawtjni: missing barriers in cache initialization, RHBZ#957181
