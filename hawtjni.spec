@@ -5,7 +5,7 @@ Release:          3.3
 Summary:          Code generator that produces the JNI code
 Group:		  Development/Java
 License:          ASL 2.0 and EPL and BSD
-URL:              http://hawtjni.fusesource.org/
+URL:              https://hawtjni.fusesource.org/
 BuildArch:        noarch
 
 Source0:          https://github.com/fusesource/hawtjni/archive/hawtjni-project-%{version}.tar.gz
